@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">NewLoanCalculator</string>
+    <string name="loanCalc">Калькулятор займов</string>
+    <string name="loan_amount">Сумма займа</string>
+    <string name="date">дд.мм.гггг</string>
+    <string name="inDay">В день</string>
+    <string name="inMonth">В месяц</string>
+    <string name="rate">Процентная ставка</string>
+    <string name="calculate">Расчитать</string>
+</resources>
