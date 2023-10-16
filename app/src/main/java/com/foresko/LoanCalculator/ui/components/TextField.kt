@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -28,9 +29,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.foresko.LoanCalculator.ui.enumClass.TextFieldType
 import com.foresko.LoanCalculator.ui.theme.LoanTheme
 import com.foresko.LoanCalculator.utils.visualTransformations.currencyVisualTransformation
 import com.foresko.LoanCalculator.utils.visualTransformations.percentVisualTransformation
+import java.util.Currency
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -40,7 +43,10 @@ fun SumTextField(
     textFieldType: TextFieldType,
 ) {
     val visualTrans = when (textFieldType) {
-        TextFieldType.LOAN -> currencyVisualTransformation()
+        TextFieldType.LOAN -> currencyVisualTransformation(
+            currency = Currency.getInstance("RUB"),
+            transformText = { AnnotatedString(it) }
+        )
 
         TextFieldType.RATE -> percentVisualTransformation()
         else -> VisualTransformation.None
@@ -50,11 +56,17 @@ fun SumTextField(
 
     val focusManager = LocalFocusManager.current
 
+    val keyboardType = when (textFieldType) {
+        TextFieldType.RATE -> KeyboardType.Number
+        else -> KeyboardType.Number
+    }
+
     val maxAllowedLength = when (textFieldType) {
         TextFieldType.LOAN -> 9
-        TextFieldType.RATE -> 2
+        TextFieldType.RATE -> 3
         else -> 2
     }
+
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -70,7 +82,7 @@ fun SumTextField(
             value = sum,
             onValueChange = { newValue ->
                 if (newValue.length <= maxAllowedLength) {
-                    sumRegexChange(newValue) // здесь я предполагаю, что вы хотите вызвать sumRegexChange после проверки длины
+                    sumRegexChange(newValue)
                 }
             },
             textStyle = TextStyle(
@@ -82,12 +94,12 @@ fun SumTextField(
                     includeFontPadding = false
                 )
             ),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = keyboardType
+            ),
             maxLines = 1,
             singleLine = true,
             cursorBrush = SolidColor(LoanTheme.colors.black),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
-            ),
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
@@ -141,5 +153,15 @@ fun SumTextField(
                 .padding(start = 14.dp)
                 .weight(1f, true)
         )
+    }
+}
+
+fun isValidInput(value: String, type: TextFieldType): Boolean {
+    return when (type) {
+        TextFieldType.RATE -> {
+            val regex = Regex("""^(\d(\.\d)?|([1-9]\d)(\.\d)?|99)$""")
+            value.matches(regex) && value.toDoubleOrNull()?.let { it in 0.1..99.0 } == true
+        }
+        else -> true
     }
 }

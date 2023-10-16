@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MicroLoan(
+data class Loan(
     val name: String,
     val icon: String,
     val currency: String,

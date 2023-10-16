@@ -10,7 +10,8 @@ data class LoanStyles(
     val decoratingText: TextStyle,
     val mainText: TextStyle,
     val dateDecoratingText: TextStyle,
-    val buttonText: TextStyle
+    val buttonText: TextStyle,
+    val numberText: TextStyle
 ) {
     constructor() : this(
         body = TextStyle(
@@ -37,6 +38,11 @@ data class LoanStyles(
             fontSize = 13.sp,
             fontWeight = FontWeight(400),
             lineHeight = 22.sp
+        ),
+        numberText = TextStyle(
+            fontSize = 18.sp,
+            fontWeight = FontWeight(600),
+            lineHeight = 24.sp
         )
     )
 }
