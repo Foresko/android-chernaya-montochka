@@ -89,10 +89,6 @@ class CurrencyStyleNumberVisualTransformation(
 
     private val decimalFormat = getDecimalFormat()
 
-//    private val decimalFormat = (NumberFormat.getCurrencyInstance(locale) as DecimalFormat).apply {
-//        currency = this@CurrencyStyleNumberVisualTransformation.currency
-//    }
-
     override fun filter(text: AnnotatedString): TransformedText {
         val number = text.text.toBigDecimalOrNull() ?: return TransformedText(
             text = text,

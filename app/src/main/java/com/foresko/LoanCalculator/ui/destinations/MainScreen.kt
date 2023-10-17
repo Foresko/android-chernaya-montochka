@@ -1,13 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.foresko.LoanCalculator.ui.destinations
 
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.with
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,7 +27,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,14 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.foresko.LoanCalculator.R
-import com.foresko.LoanCalculator.core.rest.Loan
 import com.foresko.LoanCalculator.navGraphs.RootNavGraph
 import com.foresko.LoanCalculator.navGraphs.RootNavigator
 import com.foresko.LoanCalculator.ui.components.LoanCalculator
@@ -59,7 +53,6 @@ import com.foresko.LoanCalculator.ui.components.TopAppBar
 import com.foresko.LoanCalculator.ui.enumClass.FilterType
 import com.foresko.LoanCalculator.ui.enumClass.TimePeriod
 import com.ramcosta.composedestinations.annotation.Destination
-import kotlinx.coroutines.flow.StateFlow
 
 @Destination
 @RootNavGraph(start = true)
@@ -80,30 +73,99 @@ fun MainScreenContent(
     viewModel: MainViewModel,
     rootNavigator: RootNavigator
 ) {
-    val focusManager = LocalFocusManager.current
-
     val offersLoan by viewModel.offers.collectAsState()
 
     val selectedPeriod by viewModel.selectedPeriod.observeAsState(initial = TimePeriod.DAY)
 
+    val context = LocalContext.current
 
-    Scaffold(
-        modifier = Modifier
-            .background(Color.White)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        topBar = { TopAppBar() }
-    ) { paddingValues ->
-        Box(
+    val locale = context.resources.configuration.locale
+
+    if (locale.language == "ru") {
+        Scaffold(
             modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            if (offersLoan != null) {
+                .background(Color.White)
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            backgroundColor = Color.White,
+            topBar = { TopAppBar() }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                if (offersLoan != null) {
+                    LazyColumn(
+                        modifier = Modifier
+                    ) {
+                        item {
+                            LoanCalculator(
+                                sumAmount = viewModel.sumAmount,
+                                changeSumAmount = { viewModel.changeSumAmount(it) },
+                                percentRate = viewModel.percentRate,
+                                changePercentRate = { viewModel.changePercentRate(it) },
+                                startDate = viewModel.startDate,
+                                changeStartDate = { viewModel.changeStartDate(it) },
+                                finalDate = viewModel.finalDate,
+                                changeFinalDate = { viewModel.changeFinalDate(it) },
+                                rootNavigator = rootNavigator,
+                                daysDifference = viewModel::daysDifference,
+                                selectedPeriod = selectedPeriod,
+                                onSelectedPeriodChange = viewModel::setSelectedPeriod,
+                            )
+                        }
+
+                        stickyHeader {
+                            Column(
+                                modifier = Modifier
+                                    .background(Color.White)
+                            ) {
+                                Spacer(modifier = Modifier.height(18.dp))
+
+                                AppNameAndCountries()
+
+                                Spacer(modifier = Modifier.height(18.dp))
+
+                                Filters(
+                                    activeFilter = viewModel.activeFilterType,
+                                    onActiveFilterChange = viewModel::onActiveFilterChange,
+                                    filterList = FilterType.values().toList()
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                        }
+
+                        items(offersLoan ?: listOf()) { offer ->
+                            MicroLoanOffer(offer = offer)
+                        }
+
+                        item { Spacer(modifier = Modifier.height(24.dp)) }
+                    }
+                } else {
+                    LoadingBox()
+                }
+            }
+        }
+    } else {
+        Scaffold(
+            modifier = Modifier
+                .background(Color.White)
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            backgroundColor = Color.White,
+            topBar = { TopAppBar() }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
                 ) {
                     item {
                         LoanCalculator(
@@ -122,34 +184,7 @@ fun MainScreenContent(
 
                         )
                     }
-
-                    stickyHeader {
-                        Column(
-                            modifier = Modifier
-                                .background(Color.White)
-                        ) {
-                            AppNameAndCountries()
-
-                            Spacer(modifier = Modifier.height(18.dp))
-
-                            Filters(
-                                activeFilter = viewModel.activeFilterType,
-                                onActiveFilterChange = viewModel::onActiveFilterChange,
-                                filterList = FilterType.values().toList()
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-                        }
-                    }
-
-                    items(offersLoan ?: listOf()) { offer ->
-                        MicroLoanOffer(offer = offer)
-                    }
-
-                    item { Spacer(modifier = Modifier.height(24.dp)) }
                 }
-            } else {
-                LoadingBox()
             }
         }
     }
@@ -160,11 +195,10 @@ private fun AppNameAndCountries() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(horizontal = 22.dp)
             .fillMaxWidth()
     ) {
         Text(
-            text = stringResource(R.string.loanCalc),
+            text = stringResource(R.string.best_deals),
             color = Color.Black,
             fontSize = 18.sp,
             lineHeight = 19.sp,

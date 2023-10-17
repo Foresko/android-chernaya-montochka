@@ -33,6 +33,7 @@ import com.foresko.LoanCalculator.ui.enumClass.TextFieldType
 import com.foresko.LoanCalculator.ui.theme.LoanTheme
 import com.foresko.LoanCalculator.utils.visualTransformations.currencyVisualTransformation
 import com.foresko.LoanCalculator.utils.visualTransformations.percentVisualTransformation
+import textFieldValueRegex
 import java.util.Currency
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -63,7 +64,7 @@ fun SumTextField(
 
     val maxAllowedLength = when (textFieldType) {
         TextFieldType.LOAN -> 9
-        TextFieldType.RATE -> 3
+        TextFieldType.RATE -> 5
         else -> 2
     }
 
@@ -81,8 +82,12 @@ fun SumTextField(
         BasicTextField(
             value = sum,
             onValueChange = { newValue ->
-                if (newValue.length <= maxAllowedLength) {
-                    sumRegexChange(newValue)
+                val processedValue = when (textFieldType) {
+                    TextFieldType.RATE -> textFieldValueRegex(newValue, "2")
+                    else -> textFieldValueRegex(newValue)
+                }
+                if (processedValue.length <= maxAllowedLength) {
+                    sumRegexChange(processedValue)
                 }
             },
             textStyle = TextStyle(
@@ -156,12 +161,3 @@ fun SumTextField(
     }
 }
 
-fun isValidInput(value: String, type: TextFieldType): Boolean {
-    return when (type) {
-        TextFieldType.RATE -> {
-            val regex = Regex("""^(\d(\.\d)?|([1-9]\d)(\.\d)?|99)$""")
-            value.matches(regex) && value.toDoubleOrNull()?.let { it in 0.1..99.0 } == true
-        }
-        else -> true
-    }
-}

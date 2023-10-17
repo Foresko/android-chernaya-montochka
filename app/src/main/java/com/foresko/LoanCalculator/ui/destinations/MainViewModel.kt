@@ -99,9 +99,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    var sumKeyboardState by mutableStateOf<Pair<KeyboardType?, Boolean>>(null to false)
-        private set
-
     init {
         viewModelScope.launch {
             networkStatusTracker.networkStatus.collectLatest {
@@ -118,5 +115,4 @@ class MainViewModel @Inject constructor(
             FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
-
 }

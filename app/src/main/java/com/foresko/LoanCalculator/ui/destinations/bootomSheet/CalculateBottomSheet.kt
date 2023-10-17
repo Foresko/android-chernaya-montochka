@@ -19,7 +19,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -36,9 +35,13 @@ import com.foresko.LoanCalculator.navGraphs.RootNavGraph
 import com.foresko.LoanCalculator.ui.enumClass.TimePeriod
 import com.foresko.LoanCalculator.ui.theme.LoanTheme
 import com.foresko.LoanCalculator.utils.LocalModalBottomSheetState
+import com.foresko.LoanCalculator.utils.visualTransformations.currencyFormatter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.spec.DestinationStyleBottomSheet
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Currency
+import java.util.Locale
 
 
 @Composable
@@ -50,15 +53,18 @@ fun Calculations(
     percentRate: String,
     selectedPeriod: TimePeriod
 ) {
-    Column(
-    ) {
+    Column{
         TopAppBar()
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         CalculationContent(
             differenceInDays = differenceInDays,
             sumAmount = sumAmount,
             percentRate = percentRate
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         BlockCalculate(
             differenceInDays = differenceInDays,
@@ -71,7 +77,7 @@ fun Calculations(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TopAppBar() {
     val coroutineScope = rememberCoroutineScope()
@@ -117,9 +123,7 @@ fun CalculationContent(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .imePadding(),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -156,6 +160,12 @@ fun CalculationContent(
 }
 
 @Composable
+fun localizedCurrencyString(amount: Double, currencyCode: String): String {
+    val format = currencyFormatter(currencyCode)
+    return format.format(amount)
+}
+
+@Composable
 fun BlockCalculate(
     differenceInDays: Int,
     sumAmount: String,
@@ -163,7 +173,12 @@ fun BlockCalculate(
     selectedPeriod: TimePeriod
 ) {
 
-    fun calculateAccruedInterest(differenceInDays: Int, sumAmount: String, percentRate: String, selectedPeriod: TimePeriod): Double {
+    fun calculateAccruedInterest(
+        differenceInDays: Int,
+        sumAmount: String,
+        percentRate: String,
+        selectedPeriod: TimePeriod
+    ): Double {
         val sum = sumAmount.toDoubleOrNull() ?: 0.0
         val rate = percentRate.toDoubleOrNull() ?: 0.0
 
@@ -174,14 +189,25 @@ fun BlockCalculate(
         }
     }
 
-    val accruedInterest = calculateAccruedInterest(differenceInDays, sumAmount, percentRate, selectedPeriod)
+    val accruedInterest =
+        calculateAccruedInterest(
+            differenceInDays,
+            sumAmount,
+            percentRate,
+            selectedPeriod
+        )
 
     val totalAmountToBeRefunded = accruedInterest + (sumAmount.toDoubleOrNull() ?: 0.0)
+
+    val accruedInterestString = localizedCurrencyString(accruedInterest.round(2), "RUB")
+
+    val totalAmountToBeRefundedString = localizedCurrencyString(totalAmountToBeRefunded.round(2), "RUB")
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(LoanTheme.colors.textFieldColor, shape = RoundedCornerShape(16.dp))
+            .padding(horizontal = 16.dp)
+            .background(LoanTheme.colors.surface, shape = RoundedCornerShape(16.dp))
     ) {
         Row(
             modifier = Modifier
@@ -201,7 +227,7 @@ fun BlockCalculate(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "${accruedInterest.round(2)} ₽",
+                text = accruedInterestString,
                 style = LoanTheme.textStyles.numberText,
                 color = LoanTheme.colors.black
             )
@@ -232,7 +258,7 @@ fun BlockCalculate(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "${totalAmountToBeRefunded.round(2)} ₽",
+                text = totalAmountToBeRefundedString,
                 style = LoanTheme.textStyles.numberText,
                 color = LoanTheme.colors.black
             )
@@ -240,7 +266,9 @@ fun BlockCalculate(
     }
 }
 
-fun Double.round(decimals: Int = 2): Double = "%.${decimals}f".format(this).toDouble()
+fun Double.round(decimals: Int = 2): Double {
+    return "%.${decimals}f".format(Locale.US, this).toDouble()
+}
 
 
 

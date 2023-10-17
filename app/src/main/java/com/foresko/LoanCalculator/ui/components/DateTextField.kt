@@ -47,50 +47,46 @@ fun DateTextField(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 52.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(LoanTheme.colors.textFieldColor)
             .border(1.dp, LoanTheme.colors.borderTextField, RoundedCornerShape(16.dp))
+            .clickable {
+                val calendar = Calendar.getInstance()
+                val year = calendar.get(Calendar.YEAR)
+                val month = calendar.get(Calendar.MONTH)
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+                val datePicker = DatePickerDialog(
+                    context,
+                    { _, selectedYear, selectedMonth, selectedDayOfMonth ->
+                        val formattedDate = "${selectedDayOfMonth.toString().padStart(2, '0')}.${(selectedMonth + 1).toString().padStart(2, '0')}.$selectedYear"
+                        localDate = formattedDate
+                        onDateChange(formattedDate)
+                    },
+                    year, month, day
+                )
+                minDate?.let {
+                    datePicker.datePicker.minDate = it.timeInMillis
+                }
+                maxDate?.let {
+                    datePicker.datePicker.maxDate = it.timeInMillis
+                }
+                datePicker.show()
+            }
     ) {
         Icon(
             painter = painterResource(id = R.drawable.calendar),
             contentDescription = null,
             tint = Color.Unspecified,
             modifier = Modifier
-                .padding(start = 8.dp)
+                .padding(horizontal = 8.dp)
                 .padding(vertical = 8.dp)
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    val calendar = Calendar.getInstance()
-                    val year = calendar.get(Calendar.YEAR)
-                    val month = calendar.get(Calendar.MONTH)
-                    val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-                    val datePicker = DatePickerDialog(
-                        context,
-                        { _, selectedYear, selectedMonth, selectedDayOfMonth ->
-                            val formattedDate = "${selectedDayOfMonth.toString().padStart(2, '0')}.${(selectedMonth + 1).toString().padStart(2, '0')}.$selectedYear"
-                            localDate = formattedDate
-                            onDateChange(formattedDate)
-                        },
-                        year, month, day
-                    )
-                    minDate?.let {
-                        datePicker.datePicker.minDate = it.timeInMillis
-                    }
-                    maxDate?.let {
-                        datePicker.datePicker.maxDate = it.timeInMillis
-                    }
-                    datePicker.show()
-                }
-        ) {
+        Box{
             Text(
                 text = if (localDate.isNotEmpty()) localDate else stringResource(id = R.string.date),
                 style = TextStyle(
@@ -98,10 +94,7 @@ fun DateTextField(
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
                     fontWeight = FontWeight(500),
-                ),
-                modifier = Modifier
-                    .padding(start = 14.dp)
-                    .align(Alignment.CenterStart)
+                )
             )
         }
     }

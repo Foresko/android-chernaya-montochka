@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
@@ -42,99 +43,62 @@ import com.foresko.LoanCalculator.utils.visualTransformations.currencyFormatter
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Composable
-fun MicroLoanOffer(
-    offer: Loan
-) {
+fun MicroLoanOffer(offer: Loan) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 6.dp)
             .fillMaxWidth()
+            .padding(vertical = 6.dp)
             .defaultMinSize(minHeight = 206.dp)
             .clip(RoundedCornerShape(16.dp))
-            .border(width = 1.dp, color = Color(0xFFF2F2F8), shape = RoundedCornerShape(16.dp))
-            .background(color = Color.White)
+            .border(width = 1.dp, color = Color(0xFFF2F2F8))
+            .background(Color.White)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            HeaderInfo(
-                name = offer.name,
-                iconUri = offer.icon,
-                rating = offer.rating
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            MainInfo(
-                rateFrom = offer.rateFrom,
-                termTo = offer.termTo,
-                termFrom = offer.termFrom,
-                sumTo = offer.sumTo,
-                currency = offer.currency
-            )
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            UrlButton(url = offer.url)
-        }
+        MicroLoanContent(offer)
     }
 }
 
 @Composable
-private fun UrlButton(
-    url: String
-) {
-    val context = LocalContext.current
-
-    val intent = remember(url) {
-        Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    }
-
-    Box(
-        contentAlignment = Alignment.Center,
+fun MicroLoanContent(offer: Loan) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 49.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(color = Color(0xFF60D06C))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(bounded = false)
-            ) {
-                try {
-                    context.startActivity(intent)
-                } catch (ex: Exception) {
-                    FirebaseCrashlytics
-                        .getInstance()
-                        .recordException(ex)
-                }
-            }
+            .padding(16.dp)
     ) {
+        HeaderInfo(offer.name, offer.icon, offer.rating)
+        Spacer(Modifier.height(14.dp))
+        MainInfo(offer)
+        Spacer(Modifier.height(18.dp))
+        UrlButton(offer.url)
+    }
+}
+
+@Composable
+private fun UrlButton(url: String) {
+    val context = LocalContext.current
+    val intent = remember(url) { Intent(Intent.ACTION_VIEW, Uri.parse(url)) }
+
+    Button(onClick = {
+        try {
+            context.startActivity(intent)
+        } catch (ex: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(ex)
+        }
+    }, modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.web),
             color = Color.White,
-            fontSize = 16.sp,
-            lineHeight = 24.sp,
             fontWeight = FontWeight(600),
-            modifier = Modifier
-                .padding(vertical = 12.dp)
+            fontSize = 16.sp
         )
     }
 }
 
 @Composable
-private fun HeaderInfo(
-    name: String,
-    rating: Float,
-    iconUri: String
-) {
+private fun HeaderInfo(name: String, iconUri: String, rating: Float) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = rememberAsyncImagePainter(Uri.parse(iconUri)),
@@ -143,98 +107,52 @@ private fun HeaderInfo(
                 .size(54.dp)
                 .clip(RoundedCornerShape(10.dp))
         )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
+        Spacer(Modifier.width(12.dp))
         Text(
             text = name,
-            color = Color.Black,
-            fontSize = 19.sp,
-            lineHeight = 24.sp,
             fontWeight = FontWeight(600),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .weight(1f, true)
+            modifier = Modifier.weight(1f)
         )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
+        Spacer(Modifier.width(12.dp))
         Icon(
             painter = painterResource(R.drawable.ic_star),
             contentDescription = null,
             tint = Color.Unspecified
         )
-
-        Spacer(modifier = Modifier.width(6.dp))
-
-        Text(
-            text = rating.toString(),
-            color = Color.Black,
-            fontSize = 14.sp,
-            lineHeight = 24.sp,
-            fontWeight = FontWeight(400),
-        )
+        Spacer(Modifier.width(6.dp))
+        Text(text = rating.toString())
     }
 }
 
 @Composable
-private fun MainInfo(
-    rateFrom: Float,
-    termTo: Int,
-    termFrom: Int,
-    sumTo: Int,
-    currency: String
-) {
+private fun MainInfo(offer: Loan) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        MainInfoItem(
-            name = stringResource(R.string.rate),
-            value = stringResource(R.string.rate_val, rateFrom)
-        )
-
-        MainInfoItem(
-            name = stringResource(R.string.term),
-            value = stringResource(R.string.term_val, termFrom, termTo)
-        )
-
-        MainInfoItem(
-            name = stringResource(R.string.sum),
-            value = stringResource(
-                R.string.sum_val,
-                currencyFormatter(currency).format(sumTo)
-            )
-        )
+        MainInfoItem(stringResource(R.string.rate), stringResource(R.string.rate_val, offer.rateFrom))
+        MainInfoItem(stringResource(R.string.term), stringResource(R.string.term_val, offer.termFrom, offer.termTo))
+        MainInfoItem(stringResource(R.string.sum), stringResource(R.string.sum_val, currencyFormatter(offer.currency).format(offer.sumTo)))
     }
 }
 
 @Composable
-private fun MainInfoItem(
-    name: String,
-    value: String
-) {
+private fun MainInfoItem(name: String, value: String) {
     Column {
         Text(
             text = name,
             color = Color(0xB3343D4E),
             fontSize = 13.sp,
-            lineHeight = 18.sp,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight(400)
+            overflow = TextOverflow.Ellipsis
         )
-
         Text(
             text = value,
-            color = Color.Black,
-            fontSize = 15.sp,
-            lineHeight = 21.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight(600),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

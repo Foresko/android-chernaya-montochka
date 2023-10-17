@@ -264,6 +264,8 @@ fun ButtonSave(
     percentRate: String,
     selectedPeriod: TimePeriod,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Box(
         modifier = Modifier
             .zIndex(1f)
@@ -277,12 +279,14 @@ fun ButtonSave(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = rememberRipple(bounded = true)
                 ) {
+                    focusManager.clearFocus()
                     rootNavigator.navigate(
                         CalculationsDestination(
                             differenceInDays = differenceInDays,
                             sumAmount = sumAmount,
                             percentRate = percentRate,
-                            selectedPeriod = selectedPeriod
+                            selectedPeriod = selectedPeriod,
+
                         )
                     )
                 }
