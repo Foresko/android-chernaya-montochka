@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NewLoanCalculator</string>
+    <string name="app_name">Микрозаймы</string>
     <string name="loanCalc">Калькулятор займов</string>
     <string name="loan_amount">Сумма займа</string>
     <string name="date">дд.мм.гггг</string>
