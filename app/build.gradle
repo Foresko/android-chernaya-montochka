@@ -13,11 +13,11 @@ plugins {
 }
 
 android {
-    namespace 'com.makarevich.CalculatorLite'
+    namespace 'com.foresko.CalculatorLite'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.makarevich.CalculatorLite"
+        applicationId "com.foresko.CalculatorLite"
         minSdk 24
         targetSdk 34
         versionCode 2

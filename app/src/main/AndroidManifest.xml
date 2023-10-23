@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name="com.makarevich.CalculatorLite.LoanCalculatorApplication"
+        android:name="com.foresko.CalculatorLite.LoanCalculatorApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

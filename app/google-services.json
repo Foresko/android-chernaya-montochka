@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "952038931484",
-    "project_id": "LoanCalculator-766e5",
-    "storage_bucket": "LoanCalculator-766e5.appspot.com"
+    "project_number": "588263851747",
+    "project_id": "calculatorlite-68d7a",
+    "storage_bucket": "calculatorlite-68d7a.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:952038931484:android:9f91d91f2e91deecdaf3d9",
+        "mobilesdk_app_id": "1:588263851747:android:4e24c2bdce7f1e7aac27d6",
         "android_client_info": {
-          "package_name": "com.makarevich.CalculatorLite"
+          "package_name": "com.foresko.CalculatorLite"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBs4DmcO-Sstdicrs0AkT3UXBrmVBINJG8"
+          "current_key": "AIzaSyDV1KE2srYR6QZ3d6jfJL3Qcx1YqUdNuQo"
         }
       ],
       "services": {
