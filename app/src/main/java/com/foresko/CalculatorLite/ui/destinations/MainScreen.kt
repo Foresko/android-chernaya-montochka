@@ -77,115 +77,69 @@ fun MainScreenContent(
 
     val selectedPeriod by viewModel.selectedPeriod.observeAsState(initial = TimePeriod.DAY)
 
-    val isRussianIp by viewModel.isRussianIp.collectAsState()
-    val context = LocalContext.current
-    val locale = context.resources.configuration.locale
-
-    when {
-        locale.language == "ru" && isRussianIp == true -> {
-            Scaffold(
-                modifier = Modifier
-                    .background(Color.White)
-                    .statusBarsPadding()
-                    .navigationBarsPadding(),
-                backgroundColor = Color.White,
-                topBar = { TopAppBar() }
-            ) { paddingValues ->
-                Box(
+    Scaffold(
+        modifier = Modifier
+            .background(Color.White)
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+        backgroundColor = Color.White,
+        topBar = { TopAppBar() }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        ) {
+            if (offersLoan != null) {
+                LazyColumn(
                     modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize()
                 ) {
-                    if (offersLoan != null) {
-                        LazyColumn(
+                    item {
+                        LoanCalculator(
+                            sumAmount = viewModel.sumAmount,
+                            changeSumAmount = { viewModel.changeSumAmount(it) },
+                            percentRate = viewModel.percentRate,
+                            changePercentRate = { viewModel.changePercentRate(it) },
+                            startDate = viewModel.startDate,
+                            changeStartDate = { viewModel.changeStartDate(it) },
+                            finalDate = viewModel.finalDate,
+                            changeFinalDate = { viewModel.changeFinalDate(it) },
+                            rootNavigator = rootNavigator,
+                            daysDifference = viewModel::daysDifference,
+                            selectedPeriod = selectedPeriod,
+                            onSelectedPeriodChange = viewModel::setSelectedPeriod,
+                        )
+                    }
+
+                    stickyHeader {
+                        Column(
                             modifier = Modifier
+                                .background(Color.White)
                         ) {
-                            item {
-                                LoanCalculator(
-                                    sumAmount = viewModel.sumAmount,
-                                    changeSumAmount = { viewModel.changeSumAmount(it) },
-                                    percentRate = viewModel.percentRate,
-                                    changePercentRate = { viewModel.changePercentRate(it) },
-                                    startDate = viewModel.startDate,
-                                    changeStartDate = { viewModel.changeStartDate(it) },
-                                    finalDate = viewModel.finalDate,
-                                    changeFinalDate = { viewModel.changeFinalDate(it) },
-                                    rootNavigator = rootNavigator,
-                                    daysDifference = viewModel::daysDifference,
-                                    selectedPeriod = selectedPeriod,
-                                    onSelectedPeriodChange = viewModel::setSelectedPeriod,
-                                )
-                            }
+                            Spacer(modifier = Modifier.height(18.dp))
 
-                            stickyHeader {
-                                Column(
-                                    modifier = Modifier
-                                        .background(Color.White)
-                                ) {
-                                    Spacer(modifier = Modifier.height(18.dp))
+                            AppNameAndCountries()
 
-                                    AppNameAndCountries()
+                            Spacer(modifier = Modifier.height(18.dp))
 
-                                    Spacer(modifier = Modifier.height(18.dp))
-
-                                    Filters(
-                                        activeFilter = viewModel.activeFilterType,
-                                        onActiveFilterChange = viewModel::onActiveFilterChange,
-                                        filterList = FilterType.values().toList()
-                                    )
-
-                                    Spacer(modifier = Modifier.height(10.dp))
-                                }
-                            }
-
-                            items(offersLoan ?: listOf()) { offer ->
-                                MicroLoanOffer(offer = offer)
-                            }
-
-                            item { Spacer(modifier = Modifier.height(24.dp)) }
-                        }
-                    } else {
-                        LoadingBox()
-                    }
-                }
-            }
-        }
-
-        else -> {
-            Scaffold(
-                modifier = Modifier
-                    .background(Color.White)
-                    .statusBarsPadding()
-                    .navigationBarsPadding(),
-                backgroundColor = Color.White,
-                topBar = { TopAppBar() }
-            ) { paddingValues ->
-                Box(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize()
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                    ) {
-                        item {
-                            LoanCalculator(
-                                sumAmount = viewModel.sumAmount,
-                                changeSumAmount = { viewModel.changeSumAmount(it) },
-                                percentRate = viewModel.percentRate,
-                                changePercentRate = { viewModel.changePercentRate(it) },
-                                startDate = viewModel.startDate,
-                                changeStartDate = { viewModel.changeStartDate(it) },
-                                finalDate = viewModel.finalDate,
-                                changeFinalDate = { viewModel.changeFinalDate(it) },
-                                rootNavigator = rootNavigator,
-                                daysDifference = viewModel::daysDifference,
-                                selectedPeriod = selectedPeriod,
-                                onSelectedPeriodChange = viewModel::setSelectedPeriod
+                            Filters(
+                                activeFilter = viewModel.activeFilterType,
+                                onActiveFilterChange = viewModel::onActiveFilterChange,
+                                filterList = FilterType.values().toList()
                             )
+
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
+
+                    items(offersLoan ?: listOf()) { offer ->
+                        MicroLoanOffer(offer = offer)
+                    }
+
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
                 }
+            } else {
+                LoadingBox()
             }
         }
     }
