@@ -8,13 +8,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.foresko.CalculatorLite.core.rest.Loan
-import com.foresko.CalculatorLite.core.rest.MicroloansRequest
+import com.foresko.CalculatorLite.core.rest.ApiService
+import com.foresko.CalculatorLite.core.rest.Country
+import com.foresko.CalculatorLite.core.rest.MicroloansRepository
+import com.foresko.CalculatorLite.core.rest.StoreInfo
 import com.foresko.CalculatorLite.network.NetworkStatusTracker
 import com.foresko.CalculatorLite.ui.enumClass.FilterType
 import com.foresko.CalculatorLite.ui.enumClass.TimePeriod
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.foresko.CalculatorLite.ui.utils.CountryCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,11 +29,17 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val networkStatusTracker: NetworkStatusTracker,
-    private val allOffersRequest: MicroloansRequest,
+    private val microloansRepository: MicroloansRepository,
+    private val microloansRequest: ApiService,
 ): ViewModel() {
-    private var _offers = MutableStateFlow<List<Loan>?>(null)
+    private val _storeInfo = MutableStateFlow<List<StoreInfo>?>(null)
+    val storeInfo: StateFlow<List<StoreInfo>?> = _storeInfo.asStateFlow()
 
-    val offers = _offers.asStateFlow()
+    private val _activeCountryCode = MutableStateFlow<String>("")
+    val activeCountryCode: StateFlow<String> = _activeCountryCode.asStateFlow()
+
+    private val _countries = MutableStateFlow<List<Country>?>(null)
+    val countries: StateFlow<List<Country>?> = _countries.asStateFlow()
 
     var sumAmount by mutableStateOf("")
         private set
@@ -86,17 +92,16 @@ class MainViewModel @Inject constructor(
         _selectedPeriod.value = period
     }
 
-
     var activeFilterType by mutableStateOf(FilterType.Rating)
         private set
 
     fun onActiveFilterChange(activeFilter: FilterType) {
         this.activeFilterType = activeFilter
-        _offers.value = when (activeFilter) {
-            FilterType.Rating -> _offers.value?.sortedByDescending { it.rating }
-            FilterType.Rate -> _offers.value?.sortedBy { it.rateFrom }
-            FilterType.Sum -> _offers.value?.sortedByDescending { it.sumTo.toFloat() }
-            FilterType.Term -> _offers.value?.sortedByDescending { it.termTo.toFloat() }
+        _storeInfo.value = when (activeFilter) {
+            FilterType.Rating -> storeInfo.value?.sortedByDescending { it.rating }
+            FilterType.Rate -> storeInfo.value?.sortedBy { it.rateFrom }
+            FilterType.Sum -> storeInfo.value?.sortedByDescending { it.sumTo.toFloat() }
+            FilterType.Term -> storeInfo.value?.sortedByDescending { it.termTo.toFloat() }
         }
     }
 
@@ -106,24 +111,36 @@ class MainViewModel @Inject constructor(
                 getMortgages()
             }
         }
-    }
 
-    private suspend fun getMortgages() {
-        try {
-            _offers.value = allOffersRequest.infoGet()
-        } catch (e: Exception) {
-            Log.d("mortgages", "error = $e")
-            FirebaseCrashlytics.getInstance().recordException(e)
+        viewModelScope.launch {
+            networkStatusTracker.networkStatus.collectLatest { updateActiveCountryCode() }
+        }
+
+        viewModelScope.launch {
+            networkStatusTracker.networkStatus.collectLatest {
+                loadCountries()
+            }
         }
     }
 
-    private val _isRussianIp = MutableStateFlow<Boolean?>(null)
-
-    val isRussianIp: StateFlow<Boolean?> = _isRussianIp
-
-    init {
+    private fun loadCountries() {
         viewModelScope.launch {
-            _isRussianIp.value = CountryCode().isRussianIp() // Ваш код проверки IP-адреса.
+            val response = microloansRequest.infoGet()
+            _countries.value = response.countries
+        }
+    }
+
+    private fun updateActiveCountryCode() {
+        viewModelScope.launch {
+            _activeCountryCode.value = microloansRepository.getActiveCountryCode()
+        }
+    }
+
+    private fun getMortgages() {
+        try {
+            viewModelScope.launch { _storeInfo.value = microloansRepository.getStoreInfo() }
+        } catch (e: Exception) {
+            Log.d("mortgages", "error = $e")
         }
     }
 }

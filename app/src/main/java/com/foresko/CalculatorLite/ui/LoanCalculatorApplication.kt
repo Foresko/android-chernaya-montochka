@@ -1,7 +1,6 @@
 package com.foresko.CalculatorLite.ui
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,21 +11,25 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.plusAssign
-import com.foresko.LoanCalculator.ui.destinations.NavGraphs
-import com.foresko.CalculatorLite.navGraphs.RootNavigator
-import com.foresko.CalculatorLite.utils.LocalModalBottomSheetState
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
 import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
 import com.ramcosta.composedestinations.navigation.dependency
+import com.foresko.CalculatorLite.ui.destinations.NavGraphs
+import com.foresko.CalculatorLite.ui.destinations.destinations.MainScreenDestination
+import com.foresko.CalculatorLite.ui.destinations.destinations.SelectCountryDestination
+import com.foresko.CalculatorLite.ui.navGraphs.RootNavigator
+import com.foresko.CalculatorLite.utils.LocalModalBottomSheetState
+import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 
 
 @Composable
@@ -34,8 +37,18 @@ import com.ramcosta.composedestinations.navigation.dependency
     ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class,
     ExperimentalMaterialApi::class
 )
-fun LoanCalculatorApplication() {
+fun LoanCalculatorApplication(
+    viewModel: LoanCalculatorApplicationViewModel = hiltViewModel(),
+) {
     val navController = rememberNavController()
+
+    val isFirstStart by viewModel.isFirstStart.collectAsState()
+
+    val startDestination = when (isFirstStart) {
+        true -> SelectCountryDestination
+        false -> MainScreenDestination
+        else -> null
+    }
 
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -47,6 +60,7 @@ fun LoanCalculatorApplication() {
     navController.navigatorProvider += bottomSheetNavigator
 
     val systemUiController = rememberSystemUiController()
+
     SideEffect {
         systemUiController.setStatusBarColor(
             color = Color.Transparent,
@@ -63,24 +77,18 @@ fun LoanCalculatorApplication() {
             bottomSheetNavigator = bottomSheetNavigator,
             sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         ) {
-            DestinationsNavHost(
-                modifier = Modifier
-                    .fillMaxSize(),
-                navGraph = NavGraphs.root,
-                engine = rememberAnimatedNavHostEngine(
-                    rootDefaultAnimations = RootNavGraphDefaultAnimations(
-                        enterTransition = { EnterTransition.None },
-                        exitTransition = { ExitTransition.None },
-                        popEnterTransition = { EnterTransition.None },
-                        popExitTransition = { ExitTransition.None }
-                    ),
-                    defaultAnimationsForNestedNavGraph = mapOf()
-                ),
-                navController = navController,
-                dependenciesContainerBuilder = {
-                    dependency(RootNavigator(destinationsNavigator))
-                }
-            )
+            if (startDestination != null) {
+                DestinationsNavHost(
+                    modifier = Modifier.fillMaxSize(),
+                    navGraph = NavGraphs.root,
+                    startRoute = startDestination,
+                    engine = rememberAnimatedNavHostEngine(),
+                    navController = navController,
+                    dependenciesContainerBuilder = {
+                        dependency(RootNavigator(destinationsNavigator))
+                    }
+                )
+            }
         }
     }
 }

@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.foresko.CalculatorLite.ui.destinations
 
 import androidx.annotation.StringRes
@@ -26,8 +24,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,21 +36,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.foresko.CalculatorLite.R
-import com.foresko.CalculatorLite.navGraphs.RootNavGraph
-import com.foresko.CalculatorLite.navGraphs.RootNavigator
 import com.foresko.CalculatorLite.ui.components.LoanCalculator
 import com.foresko.CalculatorLite.ui.components.MicroLoanOffer
 import com.foresko.CalculatorLite.ui.components.TopAppBar
 import com.foresko.CalculatorLite.ui.enumClass.FilterType
 import com.foresko.CalculatorLite.ui.enumClass.TimePeriod
+import com.foresko.CalculatorLite.ui.navGraphs.RootNavigator
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+
 
 @Destination
 @RootNavGraph(start = true)
@@ -73,7 +71,13 @@ fun MainScreenContent(
     viewModel: MainViewModel,
     rootNavigator: RootNavigator
 ) {
-    val offersLoan by viewModel.offers.collectAsState()
+    val storeInfo = viewModel.storeInfo.collectAsState().value
+
+    val activeCountryCode = viewModel.activeCountryCode.collectAsState().value
+
+    val countries = viewModel.countries.collectAsState().value
+
+    val activeCountryFlagUrl = countries?.find { it.code == activeCountryCode }?.flagUrl ?: ""
 
     val selectedPeriod by viewModel.selectedPeriod.observeAsState(initial = TimePeriod.DAY)
 
@@ -83,14 +87,18 @@ fun MainScreenContent(
             .statusBarsPadding()
             .navigationBarsPadding(),
         backgroundColor = Color.White,
-        topBar = { TopAppBar() }
+        topBar = { TopAppBar(
+            iconUri = activeCountryFlagUrl,
+            rootNavigator = rootNavigator
+        ) }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .background(Color.White),
         ) {
-            if (offersLoan != null) {
+            if (storeInfo != null) {
                 LazyColumn(
                     modifier = Modifier
                 ) {
@@ -132,7 +140,7 @@ fun MainScreenContent(
                         }
                     }
 
-                    items(offersLoan ?: listOf()) { offer ->
+                    items(storeInfo ?: listOf()) { offer ->
                         MicroLoanOffer(offer = offer)
                     }
 

@@ -30,12 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.foresko.CalculatorLite.R
-import com.foresko.CalculatorLite.navGraphs.RootNavGraph
+
 import com.foresko.CalculatorLite.ui.enumClass.TimePeriod
 import com.foresko.CalculatorLite.ui.theme.LoanTheme
 import com.foresko.CalculatorLite.utils.LocalModalBottomSheetState
 import com.foresko.CalculatorLite.utils.visualTransformations.currencyFormatter
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.spec.DestinationStyleBottomSheet
 import kotlinx.coroutines.launch
 import java.util.Locale

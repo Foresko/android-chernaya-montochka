@@ -16,11 +16,6 @@ object LoanTheme {
         @ReadOnlyComposable
         get() = LocalLoanColors.current
 
-    /*val gradients: Calculator_gradients
-        @Composable
-        @ReadOnlyComposable
-        get() = LocalCalculatorGradients.current*/
-
     val textStyles: LoanStyles
         @Composable
         @ReadOnlyComposable

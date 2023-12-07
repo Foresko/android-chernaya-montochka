@@ -23,4 +23,6 @@
     <string name="term">Срок (дни)</string>
     <string name="sum">Сумма</string>
     <string name="best_deals">Лучшие предложения</string>
+    <string name="take_country">Выберите страну</string>
+    <string name="continue_button">Продолжить</string>
 </resources>

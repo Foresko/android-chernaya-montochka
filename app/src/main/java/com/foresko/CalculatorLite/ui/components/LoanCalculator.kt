@@ -35,9 +35,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.foresko.LoanCalculator.ui.destinations.destinations.CalculationsDestination
 import com.foresko.CalculatorLite.R
-import com.foresko.CalculatorLite.navGraphs.RootNavigator
+import com.foresko.CalculatorLite.ui.navGraphs.RootNavigator
+import com.foresko.CalculatorLite.ui.destinations.destinations.CalculationsDestination
 import com.foresko.CalculatorLite.ui.enumClass.TextFieldType
 import com.foresko.CalculatorLite.ui.enumClass.TimePeriod
 import com.foresko.CalculatorLite.ui.theme.LoanTheme

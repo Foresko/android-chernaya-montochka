@@ -1,4 +1,4 @@
-package com.foresko.CalculatorLite.navGraphs
+package com.foresko.CalculatorLite.ui.navGraphs
 
 import com.ramcosta.composedestinations.annotation.NavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

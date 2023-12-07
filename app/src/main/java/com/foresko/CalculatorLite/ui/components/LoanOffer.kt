@@ -37,13 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.foresko.CalculatorLite.R
-import com.foresko.CalculatorLite.core.rest.Loan
+import com.foresko.CalculatorLite.core.rest.StoreInfo
 import com.foresko.CalculatorLite.ui.theme.LoanTheme
 import com.foresko.CalculatorLite.utils.visualTransformations.currencyFormatter
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Composable
-fun MicroLoanOffer(offer: Loan) {
+fun MicroLoanOffer(offer: StoreInfo) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -59,13 +58,13 @@ fun MicroLoanOffer(offer: Loan) {
 }
 
 @Composable
-fun MicroLoanContent(offer: Loan) {
+fun MicroLoanContent(offer: StoreInfo) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        HeaderInfo(offer.name, offer.icon, offer.rating)
+        HeaderInfo(offer.title, offer.icon, offer.rating)
 
         Spacer(Modifier.height(14.dp))
 
@@ -101,9 +100,6 @@ private fun UrlButton(
                 try {
                     context.startActivity(intent)
                 } catch (ex: Exception) {
-                    FirebaseCrashlytics
-                        .getInstance()
-                        .recordException(ex)
                 }
             }
     ) {
@@ -159,7 +155,7 @@ private fun HeaderInfo(
 }
 
 @Composable
-private fun MainInfo(offer: Loan) {
+private fun MainInfo(offer: StoreInfo) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween

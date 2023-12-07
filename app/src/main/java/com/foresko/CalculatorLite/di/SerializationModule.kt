@@ -1,6 +1,6 @@
 package com.foresko.CalculatorLite.di
 
-import com.foresko.CalculatorLite.core.rest.MicroloansRequest
+import com.foresko.CalculatorLite.core.rest.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,14 +17,14 @@ object SerializationModule {
     @Provides
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://microloans.hb.ru-msk.vkcs.cloud")
+            .baseUrl("https://financial-apps.hb.ru-msk.vkcs.cloud/microloans/microloans_second/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     @Provides
     @Singleton
-    fun providePurchaseSubscriptionInfo(retrofit: Retrofit): MicroloansRequest {
-        return retrofit.create(MicroloansRequest::class.java)
+    fun providePurchaseSubscriptionInfo(retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
     }
 }
