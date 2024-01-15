@@ -17,7 +17,7 @@ object SerializationModule {
     @Provides
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://financial-apps.hb.ru-msk.vkcs.cloud/microloans/microloans_second/")
+            .baseUrl("https://financial-apps.hb.ru-msk.vkcs.cloud/microloans/s_microloans_calculator_first/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
