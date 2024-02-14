@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -51,7 +52,7 @@ fun Calculations(
     percentRate: String,
     selectedPeriod: TimePeriod
 ) {
-    Column{
+    Column {
         TopAppBar()
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -129,7 +130,8 @@ fun CalculationContent(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.money_bag),
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(148.dp)
             )
 
             Text(
@@ -199,7 +201,8 @@ fun BlockCalculate(
 
     val accruedInterestString = localizedCurrencyString(accruedInterest.round(2), "RUB")
 
-    val totalAmountToBeRefundedString = localizedCurrencyString(totalAmountToBeRefunded.round(2), "RUB")
+    val totalAmountToBeRefundedString =
+        localizedCurrencyString(totalAmountToBeRefunded.round(2), "RUB")
 
     Column(
         modifier = Modifier

@@ -97,11 +97,8 @@ private fun UrlButton(
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0xFFF1F611),
-                        Color(0xFF29D0AF),
-                        Color(0xFF29D0AF),
-                        Color(0xFF29D0AF),
-                        Color(0xFF0DC242)
+                        Color(0xFFEDA534),
+                        Color(0xFFFD8A53),
                     ),
                     start = Offset(-0.9f, Float.POSITIVE_INFINITY),
                     end = Offset(Float.POSITIVE_INFINITY, 0.9f)

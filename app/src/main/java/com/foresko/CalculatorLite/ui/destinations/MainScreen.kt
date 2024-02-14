@@ -140,7 +140,7 @@ fun MainScreenContent(
                         }
                     }
 
-                    items(storeInfo ?: listOf()) { offer ->
+                    items(storeInfo) { offer ->
                         MicroLoanOffer(offer = offer)
                     }
 

@@ -50,7 +50,6 @@ fun DateTextField(
             .defaultMinSize(minHeight = 52.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(LoanTheme.colors.textFieldColor)
-            .border(1.dp, LoanTheme.colors.borderTextField, RoundedCornerShape(16.dp))
             .clickable {
                 val calendar = Calendar.getInstance()
                 val year = calendar.get(Calendar.YEAR)

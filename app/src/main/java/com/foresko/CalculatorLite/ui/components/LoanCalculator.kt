@@ -1,6 +1,7 @@
 package com.foresko.CalculatorLite.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -216,12 +217,13 @@ fun InterestRate(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
-                .background(
-                    if (selectedPeriod == TimePeriod.DAY) LoanTheme.colors.borderTextField
-                    else LoanTheme.colors.grayButton
+                .then(
+                    if (selectedPeriod == TimePeriod.DAY) Modifier.background(Color(0xFFFD8A53))
+                    else Modifier.border(1.dp, LoanTheme.colors.textFieldColor, RoundedCornerShape(50))
+                        .background(LoanTheme.colors.white)
                 )
-                .padding(horizontal = 12.dp, vertical = 6.dp)
                 .clickable { onSelectedPeriodChange(TimePeriod.DAY) }
+                .padding(horizontal = 12.dp, vertical = 6.dp)
                 .align(Alignment.CenterVertically)
                 .scale(0.9f)
         ) {
@@ -229,21 +231,24 @@ fun InterestRate(
                 text = stringResource(id = R.string.inDay),
                 style = LoanTheme.textStyles.buttonText,
                 letterSpacing = 0.1.sp,
-                color = LoanTheme.colors.white,
+                color = if (selectedPeriod == TimePeriod.DAY) LoanTheme.colors.white
+                else LoanTheme.colors.black,
             )
         }
 
         Spacer(modifier = Modifier.width(10.dp))
 
+        // Для "В месяц"
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
-                .background(
-                    if (selectedPeriod == TimePeriod.MONTH) LoanTheme.colors.borderTextField
-                    else LoanTheme.colors.grayButton
+                .then(
+                    if (selectedPeriod == TimePeriod.MONTH) Modifier.background(Color(0xFFFD8A53))
+                    else Modifier.border(1.dp, LoanTheme.colors.textFieldColor, RoundedCornerShape(50))
+                        .background(LoanTheme.colors.white)
                 )
-                .padding(horizontal = 12.dp, vertical = 6.dp)
                 .clickable { onSelectedPeriodChange(TimePeriod.MONTH) }
+                .padding(horizontal = 12.dp, vertical = 6.dp)
                 .align(Alignment.CenterVertically)
                 .scale(0.9f)
         ) {
@@ -251,7 +256,8 @@ fun InterestRate(
                 text = stringResource(id = R.string.inMonth),
                 style = LoanTheme.textStyles.buttonText,
                 letterSpacing = 0.1.sp,
-                color = LoanTheme.colors.white,
+                color = if (selectedPeriod == TimePeriod.MONTH) LoanTheme.colors.white
+                else LoanTheme.colors.black,
             )
         }
     }
@@ -290,7 +296,7 @@ fun ButtonSave(
                             percentRate = percentRate,
                             selectedPeriod = selectedPeriod,
 
-                        )
+                            )
                     )
                 }
         ) {
