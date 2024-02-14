@@ -27,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -92,7 +94,19 @@ private fun UrlButton(
             .fillMaxWidth()
             .defaultMinSize(minHeight = 49.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(LoanTheme.colors.borderTextField)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFF1F611),
+                        Color(0xFF29D0AF),
+                        Color(0xFF29D0AF),
+                        Color(0xFF29D0AF),
+                        Color(0xFF0DC242)
+                    ),
+                    start = Offset(-0.9f, Float.POSITIVE_INFINITY),
+                    end = Offset(Float.POSITIVE_INFINITY, 0.9f)
+                )
+            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = false)

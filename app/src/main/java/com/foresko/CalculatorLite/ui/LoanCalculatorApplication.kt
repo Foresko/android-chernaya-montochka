@@ -1,6 +1,5 @@
 package com.foresko.CalculatorLite.ui
 
-
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,7 +29,6 @@ import com.foresko.CalculatorLite.ui.destinations.destinations.SelectCountryDest
 import com.foresko.CalculatorLite.ui.navGraphs.RootNavigator
 import com.foresko.CalculatorLite.utils.LocalModalBottomSheetState
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-
 
 @Composable
 @OptIn(
