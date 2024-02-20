@@ -18,7 +18,8 @@ class LoanColors(
     noActiveButton: Color,
     blueText: Color,
     surface: Color,
-    grayButton: Color
+    grayButton: Color,
+    errorColor: Color
 ) {
     var white: Color by mutableStateOf(white)
         private set
@@ -50,6 +51,9 @@ class LoanColors(
     var grayButton: Color by mutableStateOf(grayButton)
         private set
 
+    var errorColor: Color by mutableStateOf(errorColor)
+        private set
+
     override fun toString(): String {
         return """LoanColors(
             white=$white,
@@ -62,6 +66,7 @@ class LoanColors(
             blueText=$blueText
             surface=$surface
             grayButton=$grayButton
+            errorColor=$errorColor
         )"""
     }
 }
@@ -77,6 +82,7 @@ fun darkColors(): LoanColors = LoanColors(
     blueText = Color(0xFF1A55AF),
     surface = Color(0xFFF3F5FD),
     grayButton = Color(0xFFBABEC9),
+    errorColor = Color(0xFFCE4949),
 )
 
 val LocalLoanColors = staticCompositionLocalOf { darkColors() }

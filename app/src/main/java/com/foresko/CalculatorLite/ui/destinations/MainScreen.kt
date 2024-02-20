@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.foresko.CalculatorLite.R
 import com.foresko.CalculatorLite.ui.components.LoanCalculator
@@ -48,6 +49,7 @@ import com.foresko.CalculatorLite.ui.components.TopAppBar
 import com.foresko.CalculatorLite.ui.enumClass.FilterType
 import com.foresko.CalculatorLite.ui.enumClass.TimePeriod
 import com.foresko.CalculatorLite.ui.navGraphs.RootNavigator
+import com.foresko.CalculatorLite.utils.NetworkConnectionErrorSnackBar
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 
@@ -61,7 +63,11 @@ fun MainScreen(
 ) {
     MainScreenContent(
         viewModel = viewModel,
-        rootNavigator = rootNavigator
+        rootNavigator = rootNavigator,
+        isNetworkConnectionError = viewModel.isNetworkConnectionError,
+        changeNetworkConnectionErrorState =viewModel::changeNetworkConnectionErrorState,
+        modifier = Modifier
+            .zIndex(3f)
     )
 }
 
@@ -69,7 +75,11 @@ fun MainScreen(
 @Composable
 fun MainScreenContent(
     viewModel: MainViewModel,
-    rootNavigator: RootNavigator
+    rootNavigator: RootNavigator,
+    isNetworkConnectionError: Boolean,
+    changeNetworkConnectionErrorState: (Boolean) -> Unit,
+    modifier: Modifier
+
 ) {
     val storeInfo = viewModel.storeInfo.collectAsState().value
 
@@ -147,6 +157,13 @@ fun MainScreenContent(
                     item { Spacer(modifier = Modifier.height(24.dp)) }
                 }
             } else {
+                NetworkConnectionErrorSnackBar(
+                    isNetworkConnectionError = isNetworkConnectionError,
+                    changeNetworkConnectionState = { changeNetworkConnectionErrorState(true) },
+                    modifier = modifier
+                        .padding(top = 20.dp)
+                )
+
                 LoadingBox()
             }
         }

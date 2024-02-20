@@ -19,10 +19,4 @@ class LoanCalculatorApplicationViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(),
         initialValue = null
     )
-
-    fun completeFirstStartProcess() {
-        viewModelScope.launch {
-            firstStartDataStore.updateData { false }
-        }
-    }
 }

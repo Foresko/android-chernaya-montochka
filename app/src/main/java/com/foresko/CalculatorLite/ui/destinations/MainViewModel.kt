@@ -41,6 +41,13 @@ class MainViewModel @Inject constructor(
     private val _countries = MutableStateFlow<List<Country>?>(null)
     val countries: StateFlow<List<Country>?> = _countries.asStateFlow()
 
+    fun changeNetworkConnectionErrorState(isNetworkConnectionError: Boolean) {
+        this.isNetworkConnectionError = isNetworkConnectionError
+    }
+
+    var isNetworkConnectionError by mutableStateOf(false)
+        private set
+
     var sumAmount by mutableStateOf("")
         private set
 
@@ -106,6 +113,12 @@ class MainViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            networkStatusTracker.networkStatus.collectLatest {
+            }
+        }
+
+
         viewModelScope.launch {
             networkStatusTracker.networkStatus.collectLatest {
                 getMortgages()
