@@ -5,10 +5,10 @@
     <string name="date">дд.мм.гггг</string>
     <string name="inDay">В день</string>
     <string name="inMonth">В месяц</string>
-    <string name="rate">Процентная ставка</string>
+    <string name="rate">Ставка</string>
     <string name="calculate">Расчитать</string>
     <string name="start_date">Дата выдачи</string>
-    <string name="term_val">%1$s—%2$s</string>
+    <string name="term_val">%1$s—%2$s дн.</string>
     <string name="final_date">Дата возврата</string>
     <string name="sum_val">до %1$s</string>
     <string name="loan_calculation">Расчет займа</string>
@@ -18,12 +18,26 @@
     <string name="rate_filter">Низкая ставка</string>
     <string name="sum_filter">Большая сумма займа</string>
     <string name="term_filter">На длинный срок</string>
-    <string name="web">Сайт</string>
-    <string name="rate_val">от %1$s \%%</string>
-    <string name="term">Срок (дни)</string>
+    <string name="rateFrom">от 0%</string>
+    <string name="web">Получить деньги</string>
+    <string name="rate_val">от %1$s%%</string>
+    <string name="term">Срок</string>
     <string name="sum">Сумма</string>
     <string name="best_deals">Лучшие предложения</string>
     <string name="take_country">Выберите страну</string>
     <string name="continue_button">Продолжить</string>
     <string name="network_connection_error">Проверьте подключение к интернету</string>
+    <string name="check_internet">Проверьте подключение к интернету</string>
+
+    <plurals name="days">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дней</item>
+    </plurals>
+
+    <string name="loan_details">%1$s ₽, под %2$s%%, на %3$s</string>
+
+
+
 </resources>

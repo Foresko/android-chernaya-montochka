@@ -18,6 +18,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -102,7 +104,7 @@ fun TopAppBar() {
                 modifier = Modifier
                     .clickable(
                         interactionSource = MutableInteractionSource(),
-                        indication = rememberRipple(bounded = false),
+                        indication = ripple(bounded = false),
                     ) {
                         coroutineScope.launch {
                             sheetState.hide()
@@ -146,8 +148,19 @@ fun CalculationContent(
 
             Spacer(modifier = Modifier.height(7.dp))
 
+            val daysString = pluralStringResource(
+                id = R.plurals.days,
+                count = differenceInDays,
+                differenceInDays
+            )
+
             Text(
-                text = "$sumAmount ₽, под $percentRate%, на $differenceInDays дней",
+                text = stringResource(
+                    id = R.string.loan_details,
+                    sumAmount,
+                    percentRate,
+                    daysString
+                ),
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
@@ -158,6 +171,7 @@ fun CalculationContent(
         }
     }
 }
+
 
 @Composable
 fun localizedCurrencyString(amount: Double, currencyCode: String): String {

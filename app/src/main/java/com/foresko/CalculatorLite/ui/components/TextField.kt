@@ -2,6 +2,7 @@ package com.foresko.CalculatorLite.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -36,7 +37,7 @@ import com.foresko.CalculatorLite.utils.visualTransformations.percentVisualTrans
 import textFieldValueRegex
 import java.util.Currency
 
-@OptIn(ExperimentalComposeUiApi::class)
+
 @Composable
 fun SumTextField(
     sum: String,
@@ -50,7 +51,6 @@ fun SumTextField(
         )
 
         TextFieldType.RATE -> percentVisualTransformation()
-        else -> VisualTransformation.None
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -65,7 +65,6 @@ fun SumTextField(
     val maxAllowedLength = when (textFieldType) {
         TextFieldType.LOAN -> 9
         TextFieldType.RATE -> 5
-        else -> 2
     }
 
 
@@ -156,6 +155,7 @@ fun SumTextField(
             modifier = Modifier
                 .padding(start = 14.dp)
                 .weight(1f, true)
+                .focusable()
         )
     }
 }

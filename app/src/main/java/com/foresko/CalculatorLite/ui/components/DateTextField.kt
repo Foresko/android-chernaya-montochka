@@ -88,7 +88,7 @@ fun DateTextField(
                 text = if (localDate.isNotEmpty()) localDate else stringResource(id = R.string.date),
                 style = TextStyle(
                     color = if (localDate.isNotEmpty()) LoanTheme.colors.black else LoanTheme.colors.decoratingText.copy(alpha = 0.3f),
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     lineHeight = 24.sp,
                     fontWeight = FontWeight(500),
                 )

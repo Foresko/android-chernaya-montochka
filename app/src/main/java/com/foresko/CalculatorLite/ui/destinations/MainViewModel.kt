@@ -1,15 +1,10 @@
 package com.foresko.CalculatorLite.ui.destinations
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.foresko.CalculatorLite.core.rest.ApiService
-import com.foresko.CalculatorLite.core.rest.Country
 import com.foresko.CalculatorLite.core.rest.MicroloansRepository
 import com.foresko.CalculatorLite.core.rest.StoreInfo
 import com.foresko.CalculatorLite.network.NetworkStatusTracker
@@ -30,23 +25,14 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val networkStatusTracker: NetworkStatusTracker,
     private val microloansRepository: MicroloansRepository,
-    private val microloansRequest: ApiService,
 ): ViewModel() {
     private val _storeInfo = MutableStateFlow<List<StoreInfo>?>(null)
     val storeInfo: StateFlow<List<StoreInfo>?> = _storeInfo.asStateFlow()
 
-    private val _activeCountryCode = MutableStateFlow<String>("")
-    val activeCountryCode: StateFlow<String> = _activeCountryCode.asStateFlow()
-
-    private val _countries = MutableStateFlow<List<Country>?>(null)
-    val countries: StateFlow<List<Country>?> = _countries.asStateFlow()
-
-    fun changeNetworkConnectionErrorState(isNetworkConnectionError: Boolean) {
-        this.isNetworkConnectionError = isNetworkConnectionError
-    }
-
-    var isNetworkConnectionError by mutableStateOf(false)
+    var activeFilterType by mutableStateOf(FilterType.Rating)
         private set
+
+    private var originalStoreInfo: List<StoreInfo>? = null
 
     var sumAmount by mutableStateOf("")
         private set
@@ -92,68 +78,52 @@ class MainViewModel @Inject constructor(
         return 0
     }
 
-    private val _selectedPeriod = MutableLiveData(TimePeriod.DAY)
-    val selectedPeriod: LiveData<TimePeriod> get() = _selectedPeriod
+    private val _selectedPeriod = MutableStateFlow(TimePeriod.DAY)
+    val selectedPeriod: StateFlow<TimePeriod> get() = _selectedPeriod
 
     fun setSelectedPeriod(period: TimePeriod) {
         _selectedPeriod.value = period
     }
 
-    var activeFilterType by mutableStateOf(FilterType.Rating)
-        private set
-
     fun onActiveFilterChange(activeFilter: FilterType) {
-        this.activeFilterType = activeFilter
+        activeFilterType = activeFilter
+
         _storeInfo.value = when (activeFilter) {
-            FilterType.Rating -> storeInfo.value?.sortedByDescending { it.rating }
-            FilterType.Rate -> storeInfo.value?.sortedBy { it.rateFrom }
-            FilterType.Sum -> storeInfo.value?.sortedByDescending { it.sumTo.toFloat() }
-            FilterType.Term -> storeInfo.value?.sortedByDescending { it.termTo.toFloat() }
+            FilterType.Rating -> originalStoreInfo?.sortedByDescending { it.rating }
+            FilterType.Term -> originalStoreInfo?.sortedWith(
+                compareByDescending<StoreInfo> { it.termTo }
+                    .thenByDescending { it.rating }
+            )
+            FilterType.Rate -> originalStoreInfo?.sortedWith(
+                compareBy<StoreInfo> { it.rateFrom }
+                    .thenByDescending { it.rating }
+            )
+            FilterType.Sum -> originalStoreInfo?.sortedWith(
+                compareByDescending<StoreInfo> { it.sumTo }
+                    .thenByDescending { it.rating }
+            )
         }
     }
 
     init {
         viewModelScope.launch {
             networkStatusTracker.networkStatus.collectLatest {
-            }
-        }
-
-
-        viewModelScope.launch {
-            networkStatusTracker.networkStatus.collectLatest {
                 getMortgages()
             }
         }
-
-        viewModelScope.launch {
-            networkStatusTracker.networkStatus.collectLatest { updateActiveCountryCode() }
-        }
-
-        viewModelScope.launch {
-            networkStatusTracker.networkStatus.collectLatest {
-                loadCountries()
-            }
-        }
     }
 
-    private fun loadCountries() {
-        viewModelScope.launch {
-            val response = microloansRequest.infoGet()
-            _countries.value = response.countries
-        }
-    }
-
-    private fun updateActiveCountryCode() {
-        viewModelScope.launch {
-            _activeCountryCode.value = microloansRepository.getActiveCountryCode()
-        }
-    }
 
     private fun getMortgages() {
-        try {
-            viewModelScope.launch { _storeInfo.value = microloansRepository.getStoreInfo() }
-        } catch (e: Exception) {
-            Log.d("mortgages", "error = $e")
+        viewModelScope.launch {
+            val result = microloansRepository.getStoreInfo()
+            if (result.isSuccess) {
+                originalStoreInfo = result.getOrNull()
+                _storeInfo.value = originalStoreInfo
+            } else {
+                originalStoreInfo = null
+                _storeInfo.value = null
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.foresko.CalculatorLite.ui.theme
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -24,7 +25,7 @@ object LoanTheme {
 
 @Composable
 fun LoanTheme(content: @Composable () -> Unit) {
-    val rippleIndication = rememberRipple()
+    val rippleIndication = ripple()
 
     CompositionLocalProvider(
         LocalIndication provides rippleIndication,

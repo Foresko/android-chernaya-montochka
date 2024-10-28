@@ -7,24 +7,24 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class MicroloansRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val apiService: ApiService,
-    private val countryDataStore: CountryDataStore
 ) {
-    suspend fun getStoreInfo(): List<StoreInfo>? {
-        val countryCode = countryDataStore.activeCountry.first()
-        val response = apiService.infoGet()
-        val appStoreString = when (context.appStore) {
-            AppStore.GetApps -> "GetApps"
-            AppStore.HuaweiAppGallery -> "HuaweiAppGallery"
-            AppStore.GalaxyStore -> "GalaxyStore"
-            AppStore.RuStore -> "RuStore"
-            AppStore.Other -> "other"
+    suspend fun getStoreInfo(): Result<List<StoreInfo>> {
+        return try {
+            val response = apiService.infoGet()
+            if (response.isSuccessful) {
+                val storeInfo = response.body()
+                if (storeInfo != null) {
+                    Result.success(storeInfo)
+                } else {
+                    Result.failure(NullPointerException("Response body is null"))
+                }
+            } else {
+                Result.failure(Exception("Failed to get store info: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-
-        return apiService.infoGet().stores[appStoreString]?.get(countryCode)
-    }
-    suspend fun getActiveCountryCode(): String {
-        return countryDataStore.activeCountry.first()
     }
 }
+

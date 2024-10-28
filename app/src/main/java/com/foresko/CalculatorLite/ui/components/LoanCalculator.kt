@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -165,14 +168,14 @@ fun LoanCalculator(
                 }
             }
 
-            Spacer(modifier = Modifier.height(31.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             InterestRate(
                 selectedPeriod = selectedPeriod,
                 onSelectedPeriodChange = onSelectedPeriodChange
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             SumTextField(
                 sum = percentRate,
@@ -184,7 +187,7 @@ fun LoanCalculator(
 
             ButtonSave(
                 isClickable = allFieldsFilled,
-                color = buttonColor,
+                allFieldsFilled = allFieldsFilled,
                 rootNavigator = rootNavigator,
                 differenceInDays = differenceInDays.value,
                 sumAmount = sumAmount,
@@ -202,7 +205,6 @@ fun InterestRate(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = stringResource(id = R.string.rate),
@@ -212,14 +214,28 @@ fun InterestRate(
             modifier = Modifier.align(Alignment.CenterVertically)
         )
 
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
                 .then(
-                    if (selectedPeriod == TimePeriod.DAY) Modifier.background(Color(0xFFFD8A53))
-                    else Modifier.border(1.dp, LoanTheme.colors.textFieldColor, RoundedCornerShape(50))
+                    if (selectedPeriod == TimePeriod.DAY) Modifier.background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFFEDA534),
+                                Color(0xFFFD8A53),
+                            ),
+                            start = Offset(-0.9f, Float.POSITIVE_INFINITY),
+                            end = Offset(Float.POSITIVE_INFINITY, 0.9f)
+                        )
+                    )
+                    else Modifier
+                        .border(
+                            1.dp,
+                            LoanTheme.colors.textFieldColor,
+                            RoundedCornerShape(50)
+                        )
                         .background(LoanTheme.colors.white)
                 )
                 .clickable { onSelectedPeriodChange(TimePeriod.DAY) }
@@ -238,13 +254,26 @@ fun InterestRate(
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        // Для "В месяц"
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
                 .then(
-                    if (selectedPeriod == TimePeriod.MONTH) Modifier.background(Color(0xFFFD8A53))
-                    else Modifier.border(1.dp, LoanTheme.colors.textFieldColor, RoundedCornerShape(50))
+                    if (selectedPeriod == TimePeriod.MONTH) Modifier.background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFFEDA534),
+                                Color(0xFFFD8A53),
+                            ),
+                            start = Offset(-0.9f, Float.POSITIVE_INFINITY),
+                            end = Offset(Float.POSITIVE_INFINITY, 0.9f)
+                        )
+                    )
+                    else Modifier
+                        .border(
+                            1.dp,
+                            LoanTheme.colors.textFieldColor,
+                            RoundedCornerShape(50)
+                        )
                         .background(LoanTheme.colors.white)
                 )
                 .clickable { onSelectedPeriodChange(TimePeriod.MONTH) }
@@ -266,7 +295,7 @@ fun InterestRate(
 @Composable
 fun ButtonSave(
     isClickable: Boolean,
-    color: Color,
+    allFieldsFilled: Boolean,
     rootNavigator: RootNavigator,
     differenceInDays: Int,
     sumAmount: String,
@@ -276,46 +305,56 @@ fun ButtonSave(
     val focusManager = LocalFocusManager.current
 
     Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
-            .zIndex(1f)
-    ) {
-        Box(
-            modifier = Modifier
-                .clipToBounds()
-                .clip(RoundedCornerShape(16.dp))
-                .clickable(
-                    enabled = isClickable,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(bounded = true)
-                ) {
-                    focusManager.clearFocus()
-                    rootNavigator.navigate(
-                        CalculationsDestination(
-                            differenceInDays = differenceInDays,
-                            sumAmount = sumAmount,
-                            percentRate = percentRate,
-                            selectedPeriod = selectedPeriod,
-
-                            )
+            .fillMaxSize()
+            .clipToBounds()
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                if (allFieldsFilled)
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFFEDA534),
+                            Color(0xFFFD8A53),
+                        ),
+                        start = Offset(-0.9f, Float.POSITIVE_INFINITY),
+                        end = Offset(Float.POSITIVE_INFINITY, 0.9f)
                     )
-                }
-        ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = color
+                else
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFF5C725E).copy(alpha = 0.45f),
+                            Color(0xFF5C725E).copy(alpha = 0.45f),
+                        )
+                    )
+            )
+            .clickable(
+                enabled = isClickable,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(bounded = true)
             ) {
-                androidx.compose.material.Text(
-                    text = stringResource(id = R.string.calculate),
-                    style = TextStyle(
-                        fontWeight = FontWeight(600),
-                        fontSize = 16.sp,
-                        color = LoanTheme.colors.white,
-                        lineHeight = 24.sp
-                    ),
-                    modifier = Modifier.padding(vertical = 14.dp),
-                    textAlign = TextAlign.Center
+                focusManager.clearFocus()
+                rootNavigator.navigate(
+                    CalculationsDestination(
+                        differenceInDays = differenceInDays,
+                        sumAmount = sumAmount,
+                        percentRate = percentRate,
+                        selectedPeriod = selectedPeriod,
+
+                        )
                 )
             }
-        }
+    ) {
+        Text(
+            text = stringResource(id = R.string.calculate),
+            style = TextStyle(
+                fontWeight = FontWeight(600),
+                fontSize = 16.sp,
+                color = LoanTheme.colors.white,
+                lineHeight = 24.sp
+            ),
+            modifier = Modifier.padding(vertical = 14.dp),
+            textAlign = TextAlign.Center
+        )
     }
 }

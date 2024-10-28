@@ -1,7 +1,11 @@
 package com.foresko.CalculatorLite.ui.components
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,8 +27,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.rememberAsyncImagePainter
 import com.foresko.CalculatorLite.R
 import com.foresko.CalculatorLite.core.rest.StoreInfo
@@ -82,11 +94,7 @@ fun MicroLoanContent(offer: StoreInfo) {
 private fun UrlButton(
     url: String
 ) {
-    val context = LocalContext.current
-
-    val intent = remember(url) {
-        Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    }
+    var showWebView by remember { mutableStateOf(false) }
 
     Box(
         contentAlignment = Alignment.Center,
@@ -106,12 +114,9 @@ private fun UrlButton(
             )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(bounded = false)
+                indication = ripple(bounded = false)
             ) {
-                try {
-                    context.startActivity(intent)
-                } catch (ex: Exception) {
-                }
+                showWebView = true
             }
     ) {
         Text(
@@ -124,13 +129,57 @@ private fun UrlButton(
                 .padding(vertical = 12.dp)
         )
     }
+
+    if (showWebView) {
+        Dialog(
+            onDismissRequest = { showWebView = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            WebViewScreen(url = url) {
+                showWebView = false
+            }
+        }
+    }
+}
+
+@SuppressLint("SetJavaScriptEnabled")
+@Composable
+fun WebViewScreen(
+    url: String,
+    onClose: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        val context = LocalContext.current
+        AndroidView(
+            factory = {
+                WebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(
+                            view: WebView?,
+                            request: WebResourceRequest?
+                        ): Boolean {
+                            return false
+                        }
+                    }
+                    loadUrl(url)
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
 
 @Composable
 private fun HeaderInfo(
     name: String,
     iconUri: String,
-    rating: Float) {
+    rating: Float
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -167,13 +216,17 @@ private fun HeaderInfo(
 
 @Composable
 private fun MainInfo(offer: StoreInfo) {
+    val changedRate =
+        if (offer.rateFrom.toDouble() == 0.0) stringResource(R.string.rateFrom)
+        else stringResource(R.string.rate_val, offer.rateFrom)
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         MainInfoItem(
             stringResource(R.string.rate),
-            stringResource(R.string.rate_val, offer.rateFrom)
+            changedRate
         )
 
         MainInfoItem(
@@ -191,7 +244,8 @@ private fun MainInfo(offer: StoreInfo) {
 @Composable
 private fun MainInfoItem(
     name: String,
-    value: String) {
+    value: String
+) {
     Column {
         Text(
             text = name,
