@@ -8,7 +8,7 @@
     <string name="rate">Ставка</string>
     <string name="calculate">Расчитать</string>
     <string name="start_date">Дата выдачи</string>
-    <string name="term_val">%1$s—%2$s дн.</string>
+    <string name="term_val">%1$s — %2$s дн.</string>
     <string name="final_date">Дата возврата</string>
     <string name="sum_val">до %1$s</string>
     <string name="loan_calculation">Расчет займа</string>
